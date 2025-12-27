@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Seller profile
+  sellerProfile SellerProfile?
+  
+  // Buyer subscriptions
+  subscriptions Subscription[]
+  
+  // Auth
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SellerProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeAccountId String?  @unique
+  isVerified      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tools           Tool[]
+}
+
+model Tool {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  description     String   @db.Text
+  shortDescription String
+  category        String
+  price           Float
+  priceType       String   // "one-time" | "monthly" | "yearly"
+  imageUrl        String?
+  demoUrl         String?
+  sellerId         String
+  seller           SellerProfile @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  
+  // Tool configuration
+  isPublished     Boolean  @default(false)
+  isFeatured      Boolean  @default(false)
+  featuredUntil   DateTime?
+  
+  // Stats
+  purchaseCount   Int      @default(0)
+  rating          Float?   @default(0)
+  reviewCount     Int      @default(0)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  subscriptions   Subscription[]
+  
+  @@index([category])
+  @@index([isPublished])
+  @@index([isFeatured])
+}
+
+model Subscription {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  toolId          String
+  tool            Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  
+  stripeSubscriptionId String? @unique
+  stripeCustomerId     String
+  status              String   // "active" | "canceled" | "past_due"
+  
+  currentPeriodStart  DateTime
+  currentPeriodEnd    DateTime
+  cancelAtPeriodEnd   Boolean  @default(false)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([userId, toolId])
+  @@index([userId])
+  @@index([toolId])
+}
+
