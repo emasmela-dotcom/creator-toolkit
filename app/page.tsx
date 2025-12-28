@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Zap, Shield, TrendingUp } from "lucide-react";
+import { WhyChooseUs } from "@/components/WhyChooseUs";
+import { CreatorFlowShowcase } from "@/components/CreatorFlowShowcase";
 
 export default function Home() {
   const featuredTools = [
@@ -141,8 +143,32 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Tools */}
+      {/* CreatorFlow Highlight */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 text-white mb-12">
+          <div className="flex items-center gap-3 mb-4">
+            <Sparkles className="w-6 h-6" />
+            <span className="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full">
+              Featured Showcase
+            </span>
+          </div>
+          <h2 className="text-3xl font-bold mb-3">
+            Meet CreatorFlow - Our Flagship Tool
+          </h2>
+          <p className="text-lg text-purple-100 mb-6 max-w-2xl">
+            See how CreatorFlow demonstrates the power of integrated creator tools.
+            A complete platform that shows what's possible on our marketplace.
+          </p>
+          <Link
+            href="/tools/creatorflow"
+            className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-50 inline-flex items-center gap-2"
+          >
+            Explore CreatorFlow
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
+
+        {/* Featured Tools */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
@@ -194,6 +220,12 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* CreatorFlow Showcase */}
+      <CreatorFlowShowcase />
+
+      {/* Why Choose Us */}
+      <WhyChooseUs />
 
       {/* CTA Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">

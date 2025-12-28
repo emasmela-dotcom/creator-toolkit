@@ -1,38 +1,50 @@
 import Link from "next/link";
 import { ArrowLeft, Star, Check, ArrowRight } from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth-helpers";
+import { notFound } from "next/navigation";
+import { ReviewsSection } from "./ReviewsSection";
 
-export default function ToolDetailPage({
+export default async function ToolDetailPage({
   params,
 }: {
   params: { slug: string };
 }) {
-  // In a real app, this would fetch from the database
-  const tool = {
-    name: "Link-in-bio but for email",
-    description:
-      "Collect emails directly in your bio link. No complicated forms, no redirects. Just a simple link that captures emails from your audience.",
-    longDescription: `Transform your link-in-bio into an email collection powerhouse. This tool lets you add a simple email capture form to any link, making it easy for your audience to subscribe without leaving their current page.
-
-Perfect for creators who want to grow their email list without the hassle of setting up complex forms or managing multiple platforms.`,
-    price: 9,
-    priceType: "monthly",
-    category: "Marketing",
-    rating: 4.8,
-    reviews: 124,
-    purchases: 1200,
-    features: [
-      "One-click email capture",
-      "Customizable form design",
-      "Automatic list management",
-      "Analytics dashboard",
-      "Integrates with major email providers",
-      "Mobile-optimized",
-    ],
-    seller: {
-      name: "Creator Tools Co",
-      verified: true,
+  const tool = await prisma.tool.findUnique({
+    where: { slug: params.slug },
+    include: {
+      seller: {
+        include: {
+          user: true,
+        },
+      },
+      reviews: {
+        include: {
+          user: true,
+        },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+      },
     },
-  };
+  });
+
+  if (!tool || !tool.isPublished) {
+    notFound();
+  }
+
+  const user = await getCurrentUser();
+  const hasSubscription = user
+    ? await prisma.subscription.findUnique({
+        where: {
+          userId_toolId: {
+            userId: user.id,
+            toolId: tool.id,
+          },
+        },
+      })
+    : null;
+
+  const features = tool.description.split("\n").filter((f) => f.trim());
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -94,72 +106,51 @@ Perfect for creators who want to grow their email list without the hassle of set
                     {tool.name}
                   </h1>
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center">
-                      <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                      <span className="ml-2 font-semibold text-gray-900">
-                        {tool.rating}
-                      </span>
-                      <span className="text-gray-600 ml-1">
-                        ({tool.reviews} reviews)
-                      </span>
-                    </div>
+                    {tool.rating && (
+                      <div className="flex items-center">
+                        <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                        <span className="ml-2 font-semibold text-gray-900">
+                          {tool.rating.toFixed(1)}
+                        </span>
+                        <span className="text-gray-600 ml-1">
+                          ({tool.reviewCount} reviews)
+                        </span>
+                      </div>
+                    )}
                     <span className="text-gray-500">•</span>
-                    <span className="text-gray-600">{tool.purchases} users</span>
+                    <span className="text-gray-600">{tool.purchaseCount} users</span>
                   </div>
                 </div>
               </div>
 
-              <p className="text-xl text-gray-700 mb-6">{tool.description}</p>
-              <p className="text-gray-600 leading-relaxed mb-8">
-                {tool.longDescription}
+              <p className="text-xl text-gray-700 mb-6">{tool.shortDescription}</p>
+              <p className="text-gray-600 leading-relaxed mb-8 whitespace-pre-line">
+                {tool.description}
               </p>
 
-              <div className="border-t pt-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  Features
-                </h2>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {tool.features.map((feature, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700">{feature}</span>
-                    </div>
-                  ))}
+              {features.length > 0 && (
+                <div className="border-t pt-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                    Features
+                  </h2>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {features.map((feature, index) => (
+                      <div key={index} className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Reviews Section */}
-            <div className="bg-white rounded-xl border border-gray-200 p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                Reviews ({tool.reviews})
-              </h2>
-              <div className="space-y-6">
-                {/* Sample Review */}
-                <div className="border-b pb-6 last:border-0 last:pb-0">
-                  <div className="flex items-center gap-4 mb-3">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-                    <div>
-                      <div className="font-semibold text-gray-900">
-                        Sarah M.
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className="w-4 h-4 text-yellow-500 fill-yellow-500"
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-gray-700">
-                    This tool has been a game-changer for growing my email list.
-                    Super simple to set up and it just works!
-                  </p>
-                </div>
-              </div>
-            </div>
+            <ReviewsSection
+              toolId={tool.id}
+              reviews={tool.reviews}
+              hasSubscription={!!hasSubscription}
+            />
           </div>
 
           {/* Sidebar - Purchase Card */}
@@ -188,15 +179,15 @@ Perfect for creators who want to grow their email list without the hassle of set
                   <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
                   <div>
                     <div className="font-semibold text-gray-900">
-                      {tool.seller.name}
+                      {tool.seller.user.name || "Unknown Seller"}
                     </div>
-                    {tool.seller.verified && (
+                    {tool.seller.isVerified && (
                       <div className="text-xs text-green-600">Verified Seller</div>
                     )}
                   </div>
                 </div>
                 <Link
-                  href={`/sellers/${tool.seller.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  href={`/sellers/${tool.seller.user.name?.toLowerCase().replace(/\s+/g, "-")}`}
                   className="text-sm text-gray-600 hover:text-gray-900"
                 >
                   View all tools by this seller
@@ -209,4 +200,3 @@ Perfect for creators who want to grow their email list without the hassle of set
     </div>
   );
 }
-

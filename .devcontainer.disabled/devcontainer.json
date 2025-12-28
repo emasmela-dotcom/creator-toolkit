@@ -1,22 +1,13 @@
 {
   "name": "Creator Toolkit",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
-  "features": {
-    "ghcr.io/devcontainers/features/postgres:1": {
-      "version": "latest"
-    }
-  },
-  "forwardPorts": [3000, 5432],
+  "forwardPorts": [3000],
   "portsAttributes": {
     "3000": {
       "label": "Next.js App",
       "onAutoForward": "notify"
-    },
-    "5432": {
-      "label": "PostgreSQL"
     }
   },
-  "postCreateCommand": "npm install && npx prisma generate",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -31,4 +22,3 @@
     }
   }
 }
-

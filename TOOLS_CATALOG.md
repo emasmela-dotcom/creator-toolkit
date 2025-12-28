@@ -214,3 +214,4 @@ Example:
 - Seller keeps $700-800/month
 - Marketplace earns $200-300/month
 
+

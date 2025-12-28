@@ -276,3 +276,4 @@ This document lists all 44 tools/features from CreatorFlow that can be sold indi
 3. Configure marketplace to show both bundle and individual options
 4. Set pricing for each tool and the bundle
 
+

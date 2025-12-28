@@ -1,6 +1,52 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SignupPage() {
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const isSeller = formData.get("isSeller") === "on";
+
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, isSeller }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Something went wrong");
+        setLoading(false);
+        return;
+      }
+
+      // If seller checkbox is checked, redirect to seller onboarding
+      if (isSeller) {
+        router.push("/sell?onboard=true");
+      } else {
+        router.push("/login?signup=success");
+      }
+    } catch (error) {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
@@ -14,13 +60,20 @@ export default function SignupPage() {
           <p className="text-gray-600">Start buying or selling tools</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-8">
-          <form className="space-y-6">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Name
               </label>
               <input
                 type="text"
+                name="name"
+                required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                 placeholder="John Doe"
               />
@@ -31,6 +84,8 @@ export default function SignupPage() {
               </label>
               <input
                 type="email"
+                name="email"
+                required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                 placeholder="you@example.com"
               />
@@ -41,13 +96,17 @@ export default function SignupPage() {
               </label>
               <input
                 type="password"
+                name="password"
+                required
+                minLength={6}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                 placeholder="••••••••"
               />
+              <p className="mt-1 text-xs text-gray-500">Minimum 6 characters</p>
             </div>
             <div>
               <label className="flex items-center gap-2">
-                <input type="checkbox" className="rounded" />
+                <input type="checkbox" name="isSeller" className="rounded" />
                 <span className="text-sm text-gray-600">
                   I want to sell tools on the marketplace
                 </span>
@@ -55,9 +114,10 @@ export default function SignupPage() {
             </div>
             <button
               type="submit"
-              className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800"
+              disabled={loading}
+              className="w-full bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Account
+              {loading ? "Creating account..." : "Create Account"}
             </button>
           </form>
           <div className="mt-6 text-center text-sm">
@@ -71,4 +131,3 @@ export default function SignupPage() {
     </div>
   );
 }
-

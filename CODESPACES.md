@@ -12,20 +12,27 @@ This project is optimized for GitHub Codespaces. Follow these steps to get start
 2. **Wait for Setup**
    - The devcontainer will automatically:
      - Install Node.js 18
-     - Set up PostgreSQL database
      - Install all npm dependencies
      - Generate Prisma client
 
-3. **Configure Environment**
-   - Create a `.env` file in the root:
+3. **Quick Setup (Recommended)**
+   - Run the setup script:
      ```bash
-     touch .env
+     chmod +x setup.sh
+     ./setup.sh
      ```
-   - Add your environment variables (see `.env.example` for template)
-   - For local development in Codespaces, use:
-     ```env
-     DATABASE_URL="postgresql://postgres:postgres@localhost:5432/creator-toolkit?schema=public"
+   - This will create `.env`, install dependencies, and set up the database
+
+4. **Manual Setup (Alternative)**
+   - Create a `.env` file:
+     ```bash
+     cp .env.example .env
      ```
+   - Generate a secret:
+     ```bash
+     openssl rand -base64 32
+     ```
+   - Add it to `.env` as `NEXTAUTH_SECRET=your-generated-secret`
 
 4. **Initialize Database**
    ```bash
@@ -45,21 +52,12 @@ This project is optimized for GitHub Codespaces. Follow these steps to get start
 ## Ports
 
 - **3000**: Next.js development server
-- **5432**: PostgreSQL database (internal)
 
-## Database Access
+## Database
 
-The PostgreSQL database is automatically set up with:
-- Username: `postgres`
-- Password: `postgres`
-- Database: `creator-toolkit`
+The project uses **SQLite** for development (no setup required).
 
-You can access it via:
-```bash
-psql -U postgres -d creator-toolkit
-```
-
-Or use Prisma Studio:
+You can view/edit data using Prisma Studio:
 ```bash
 npm run db:studio
 ```
@@ -77,8 +75,8 @@ npm run db:studio
 - Make sure port 3000 is set to "Public" or "Private"
 
 **Database connection issues?**
-- Ensure PostgreSQL is running: `sudo service postgresql status`
-- Check your `DATABASE_URL` in `.env`
+- Make sure you ran `npx prisma db push`
+- Check your `DATABASE_URL` in `.env` (should be `file:./dev.db`)
 
 **Dependencies not installing?**
 - Run `npm install` manually
