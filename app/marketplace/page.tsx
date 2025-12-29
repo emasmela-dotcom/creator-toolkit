@@ -38,27 +38,43 @@ export default async function MarketplacePage({
   }
 
   // Fetch tools from database
-  const tools = await prisma.tool.findMany({
-    where,
-    include: {
-      seller: {
-        include: {
-          user: true,
+  let tools: any[] = [];
+  try {
+    tools = await prisma.tool.findMany({
+      where,
+      include: {
+        seller: {
+          include: {
+            user: true,
+          },
+        },
+        reviews: {
+          select: {
+            rating: true,
+          },
         },
       },
-      reviews: {
-        select: {
-          rating: true,
-        },
-      },
-    },
-    orderBy: [
-      { isFeatured: "desc" },
-      { purchaseCount: "desc" },
-      { createdAt: "desc" },
-    ],
-    take: 50,
-  });
+      orderBy: [
+        { isFeatured: "desc" },
+        { purchaseCount: "desc" },
+        { createdAt: "desc" },
+      ],
+      take: 50,
+    });
+    
+    // Calculate ratings for each tool
+    tools = tools.map(tool => ({
+      ...tool,
+      rating: tool.reviews.length > 0
+        ? tool.reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / tool.reviews.length
+        : null,
+      reviewCount: tool.reviews.length,
+    }));
+  } catch (error: any) {
+    console.error("Error fetching tools:", error);
+    // Return empty array if database error - page will still load
+    tools = [];
+  }
 
   return <MarketplaceClient tools={tools} categories={categories} />;
 }

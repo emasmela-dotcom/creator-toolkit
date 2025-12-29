@@ -130,13 +130,20 @@ The marketplace fee is set to **15%** (configured in `lib/constants.ts`). This i
 - [ ] Payment processing (pending)
 - [ ] Email notifications (pending)
 
+## Domain Setup
+
+Your domain: **micro-saasmarketplace.com**
+
+See [DOMAIN_SETUP.md](./DOMAIN_SETUP.md) for complete domain configuration instructions.
+
 ## Next Steps
 
-1. Test all features
-2. Add Stripe Connect for payments
-3. Implement payment processing
-4. Add email notifications
-5. Deploy to production
+1. Configure domain (see DOMAIN_SETUP.md)
+2. Test all features
+3. Add Stripe Connect for payments
+4. Implement payment processing
+5. Add email notifications
+6. Deploy to production
 
 ## License
 

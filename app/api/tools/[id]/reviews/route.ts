@@ -10,11 +10,11 @@ const reviewSchema = z.object({
 
 export async function GET(
   request: Request,
-  { params }: { params: { toolId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const reviews = await prisma.review.findMany({
-      where: { toolId: params.toolId },
+      where: { toolId: params.id },
       include: {
         user: {
           select: {
@@ -37,7 +37,7 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { toolId: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const user = await getCurrentUser();
@@ -53,7 +53,7 @@ export async function POST(
       where: {
         userId_toolId: {
           userId: user.id,
-          toolId: params.toolId,
+          toolId: params.id,
         },
       },
     });
@@ -70,7 +70,7 @@ export async function POST(
       where: {
         userId_toolId: {
           userId: user.id,
-          toolId: params.toolId,
+          toolId: params.id,
         },
       },
     });
@@ -87,7 +87,7 @@ export async function POST(
       review = await prisma.review.create({
         data: {
           userId: user.id,
-          toolId: params.toolId,
+          toolId: params.id,
           rating,
           comment: comment || null,
         },
@@ -96,13 +96,13 @@ export async function POST(
 
     // Update tool rating
     const reviews = await prisma.review.findMany({
-      where: { toolId: params.toolId },
+      where: { toolId: params.id },
     });
     const avgRating =
       reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
 
     await prisma.tool.update({
-      where: { id: params.toolId },
+      where: { id: params.id },
       data: {
         rating: avgRating,
         reviewCount: reviews.length,
