@@ -52,7 +52,7 @@ export default function SignupPage() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="text-2xl font-bold text-gray-900">
-            Creator Toolkit
+            Micro-SaaS Marketplace
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-2">
             Create your account

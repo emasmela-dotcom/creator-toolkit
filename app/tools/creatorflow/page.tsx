@@ -31,7 +31,7 @@ export default async function CreatorFlowPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <Link href="/" className="text-2xl font-bold text-gray-900">
-                Creator Toolkit
+                Micro-SaaS Marketplace
               </Link>
               <nav className="hidden md:flex gap-6">
                 <Link href="/marketplace" className="text-gray-600 hover:text-gray-900">
@@ -56,7 +56,7 @@ export default async function CreatorFlowPage() {
                 CreatorFlow
               </h1>
               <p className="text-2xl text-gray-700 mb-8">
-                The Complete Creator Toolkit
+                The Complete Micro-SaaS Marketplace
               </p>
               <p className="text-lg text-gray-600 max-w-3xl mx-auto">
                 CreatorFlow is our flagship tool - a comprehensive platform that demonstrates

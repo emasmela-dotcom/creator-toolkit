@@ -49,7 +49,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="text-2xl font-bold text-gray-900">
-              Creator Toolkit
+              Micro-SaaS Marketplace
             </Link>
             <nav className="hidden md:flex gap-6">
               <Link href="/marketplace" className="text-gray-600 hover:text-gray-900">
@@ -253,7 +253,7 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-4">
-                Creator Toolkit
+                Micro-SaaS Marketplace
               </h3>
               <p className="text-gray-600 text-sm">
                 Tools for creators, not platforms.
@@ -284,7 +284,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t mt-8 pt-8 text-center text-sm text-gray-600">
-            <p>© 2024 Creator Toolkit. All rights reserved.</p>
+            <p>© 2024 Micro-SaaS Marketplace. All rights reserved.</p>
           </div>
         </div>
       </footer>

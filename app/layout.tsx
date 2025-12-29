@@ -3,7 +3,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Creator Toolkit | Tools for Creators",
+  title: "Micro-SaaS Marketplace | Tools for Creators",
   description: "A marketplace where creators buy small, focused tools. Simple tools for non-tech creators.",
 };
 
