@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Search, GitCompare } from "lucide-react";
+import { ArrowRight, Search, GitCompare, Lock } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
+import { getCurrentUser } from "@/lib/auth-helpers";
 
 interface Tool {
   id: string;
@@ -62,16 +63,16 @@ export function MarketplaceClient({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
-      <header className="border-b bg-white sticky top-0 z-50">
+      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="text-2xl font-bold text-gray-900">
               Micro-SaaS Marketplace
             </Link>
             <nav className="hidden md:flex gap-6">
-              <Link href="/marketplace" className="text-gray-900 font-semibold">
+              <Link href="/marketplace" className="text-gray-600 hover:text-gray-900">
                 Marketplace
               </Link>
               <Link href="/sell" className="text-gray-600 hover:text-gray-900">
@@ -99,11 +100,11 @@ export function MarketplaceClient({
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Marketplace</h1>
-          <p className="text-xl text-gray-600">
+        <div className="mb-12 text-center">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">Marketplace</h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Discover simple, focused tools built for creators
           </p>
         </div>
@@ -245,15 +246,71 @@ export function MarketplaceClient({
                     <span className="text-gray-600 text-sm ml-1">
                       /{tool.priceType === "one-time" ? "once" : tool.priceType}
                     </span>
+                    {tool.priceType !== "one-time" && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        ${(tool.price / 30).toFixed(2)}/day • Always available
+                      </div>
+                    )}
                   </div>
                   <ArrowRight className="w-5 h-5 text-gray-400" />
                 </div>
                 </Link>
+                {/* Special link for CreatorFlow to detailed benefits page */}
+                {(tool.slug === "creatorflow" || tool.slug === "creatorflow-complete-creator-toolkit" || tool.name.toLowerCase().includes("creatorflow")) && (
+                  <Link
+                    href="/tools/creatorflow"
+                    className="mt-4 block w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-center py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all"
+                  >
+                    See All 44 Tools & Benefits →
+                  </Link>
+                )}
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Footer - matching homepage */}
+      <footer className="border-t bg-white mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">
+                Micro-SaaS Marketplace
+              </h3>
+              <p className="text-gray-600 text-sm">
+                Tools for creators, not platforms.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-4">Product</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li><Link href="/marketplace" className="hover:text-gray-900">Marketplace</Link></li>
+                <li><Link href="/sell" className="hover:text-gray-900">Sell Tools</Link></li>
+                <li><Link href="/pricing" className="hover:text-gray-900">Pricing</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li><Link href="/about" className="hover:text-gray-900">About</Link></li>
+                <li><Link href="/blog" className="hover:text-gray-900">Blog</Link></li>
+                <li><Link href="/contact" className="hover:text-gray-900">Contact</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-900 mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li><Link href="/terms" className="hover:text-gray-900">Terms</Link></li>
+                <li><Link href="/privacy" className="hover:text-gray-900">Privacy</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t mt-8 pt-8 text-center text-sm text-gray-600">
+            <p>© 2024 Micro-SaaS Marketplace. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

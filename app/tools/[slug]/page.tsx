@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth-helpers";
 import { notFound } from "next/navigation";
 import { ReviewsSection } from "./ReviewsSection";
+import { PurchaseButton } from "./PurchaseButton";
+import { SubscriptionValue } from "@/components/SubscriptionValue";
 
 export default async function ToolDetailPage({
   params,
@@ -165,14 +167,22 @@ export default async function ToolDetailPage({
                 </div>
               </div>
 
-              <button className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 mb-4 flex items-center justify-center gap-2">
-                Get Started
-                <ArrowRight className="w-5 h-5" />
-              </button>
+              <PurchaseButton
+                tool={{
+                  id: tool.id,
+                  slug: tool.slug,
+                  price: tool.price,
+                  priceType: tool.priceType,
+                  name: tool.name,
+                }}
+                userId={user?.id || null}
+              />
 
-              <div className="text-center text-sm text-gray-600 mb-6">
-                Cancel anytime • Secure payment
-              </div>
+              <SubscriptionValue
+                price={tool.price}
+                priceType={tool.priceType}
+                toolName={tool.name}
+              />
 
               <div className="border-t pt-6">
                 <div className="flex items-center gap-3 mb-4">

@@ -28,6 +28,26 @@ export default async function BuyerDashboardPage() {
     orderBy: { createdAt: "desc" },
   });
 
+  // Get user's one-time purchases
+  const purchases = await prisma.purchase.findMany({
+    where: { 
+      userId: user.id,
+      status: "completed",
+    },
+    include: {
+      tool: {
+        include: {
+          seller: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
   const activeSubscriptions = subscriptions.filter((s) => s.status === "active");
   const totalMonthlyCost = activeSubscriptions.reduce((sum, sub) => {
     if (sub.tool.priceType === "monthly") {
@@ -36,12 +56,14 @@ export default async function BuyerDashboardPage() {
     return sum;
   }, 0);
 
+  const totalTools = subscriptions.length + purchases.length;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">My Subscriptions</h1>
-          <p className="text-gray-600">Manage your tool subscriptions</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">My Tools</h1>
+          <p className="text-gray-600">Manage your subscriptions and purchased tools</p>
         </div>
 
         {/* Stats */}
@@ -72,9 +94,9 @@ export default async function BuyerDashboardPage() {
               <CreditCard className="w-5 h-5 text-gray-400" />
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-2">
-              {subscriptions.length}
+              {totalTools}
             </div>
-            <p className="text-sm text-gray-600">All subscriptions</p>
+            <p className="text-sm text-gray-600">Total tools owned</p>
           </div>
         </div>
 
@@ -83,7 +105,7 @@ export default async function BuyerDashboardPage() {
           <div className="p-6 border-b">
             <h2 className="text-xl font-semibold text-gray-900">Your Tools</h2>
           </div>
-          {subscriptions.length === 0 ? (
+          {totalTools === 0 ? (
             <div className="p-12 text-center">
               <CreditCard className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -101,6 +123,7 @@ export default async function BuyerDashboardPage() {
             </div>
           ) : (
             <div className="divide-y">
+              {/* Subscriptions */}
               {subscriptions.map((subscription) => (
                 <div key={subscription.id} className="p-6 hover:bg-gray-50">
                   <div className="flex items-center justify-between">
@@ -149,6 +172,44 @@ export default async function BuyerDashboardPage() {
                           Cancel
                         </button>
                       )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {/* One-time Purchases */}
+              {purchases.map((purchase) => (
+                <div key={purchase.id} className="p-6 hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {purchase.tool.name}
+                        </h3>
+                        <span className="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded">
+                          Owned
+                        </span>
+                      </div>
+                      <p className="text-gray-600 text-sm mb-3">
+                        {purchase.tool.shortDescription}
+                      </p>
+                      <div className="flex items-center gap-6 text-sm text-gray-600">
+                        <span className="flex items-center gap-1">
+                          <CreditCard className="w-4 h-4" />
+                          One-time purchase • ${purchase.amount.toFixed(2)}
+                        </span>
+                        <span>•</span>
+                        <span>Purchased {new Date(purchase.createdAt).toLocaleDateString()}</span>
+                        <span>•</span>
+                        <span>By {purchase.tool.seller.user.name || "Unknown"}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 ml-6">
+                      <Link
+                        href={`/tools/${purchase.tool.slug}/access`}
+                        className="px-4 py-2 text-white bg-gray-900 hover:bg-gray-800 rounded-lg text-sm font-semibold"
+                      >
+                        Access Tool
+                      </Link>
                     </div>
                   </div>
                 </div>
